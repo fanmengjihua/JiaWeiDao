@@ -1,0 +1,46 @@
+---
+import Posts from "@/layouts/components/Posts.astro";
+import Base from "@/layouts/Base.astro";
+
+let posts = [];
+
+// 只在有运行时环境时查询数据库
+if ((Astro.locals as any)?.runtime?.env?.DB) {
+  // Cloudflare Pages SSR env
+  const { DB } = (Astro.locals as any).runtime.env;
+
+  // 查询文章
+  const result = await DB.prepare(`
+    SELECT *
+    FROM articles
+    WHERE draft = 0
+    ORDER BY date DESC
+  `).all();
+
+  posts = (result.results ?? []).map((row: any) => ({
+    id: row.slug,
+    slug: row.slug,
+    body: '',
+    data: {
+      title: row.title,
+      description: row.description,
+      image: row.image,
+      date: row.date,
+      views: row.views,
+      authors: [],
+      categories: [],
+    },
+  }));
+}
+
+const title = "博客";
+---
+
+<Base title={title}>
+  <div class="section">
+    <div class="container">
+      <h1 class="h2 mb-16 text-center text-primary">{title}</h1>
+      <Posts posts={posts} fluid={false} />
+    </div>
+  </div>
+</Base>

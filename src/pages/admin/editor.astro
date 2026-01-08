@@ -1,0 +1,335 @@
+---
+import Base from "@/layouts/Base.astro";
+import config from "@/config/config.json";
+export const prerender = false;
+---
+<Base title="发布文章 - 管理后台" description="创建和编辑文章的管理界面">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-3xl font-bold">发布文章</h1>
+      <a href="/admin" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors">
+        返回管理后台
+      </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <form id="article-form" class="space-y-6">
+        <div>
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-1">
+            文章标题 *
+          </label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="请输入文章标题"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="meta_title" class="block text-sm font-medium text-gray-700 mb-1">
+            Meta 标题
+          </label>
+          <input
+            type="text"
+            id="meta_title"
+            name="meta_title"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="请输入 Meta 标题"
+          />
+        </div>
+
+        <div>
+          <label for="image" class="block text-sm font-medium text-gray-700 mb-1">
+            文章图片
+          </label>
+          <div class="flex space-x-2">
+            <input
+              type="text"
+              id="image"
+              name="image"
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="图片路径"
+            />
+            <input
+              type="file"
+              id="image-upload"
+              name="image-upload"
+              accept="image/*"
+              class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <p class="text-xs text-gray-500 mt-1">支持 JPG、PNG、GIF 格式</p>
+        </div>
+
+        <div>
+          <label for="youtube" class="block text-sm font-medium text-gray-700 mb-1">
+            YouTube 视频 ID
+          </label>
+          <input
+            type="text"
+            id="youtube"
+            name="youtube"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="请输入 YouTube 视频 ID"
+          />
+        </div>
+
+        <div>
+          <label for="authors" class="block text-sm font-medium text-gray-700 mb-1">
+            作者
+          </label>
+          <select
+            id="authors"
+            name="authors"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="JiaWeiDao" selected>JiaWeiDao</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="views" class="block text-sm font-medium text-gray-700 mb-1">
+            浏览量
+          </label>
+          <input
+            type="number"
+            id="views"
+            name="views"
+            min="0"
+            value="0"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label for="markdown" class="block text-sm font-medium text-gray-700 mb-1">
+            文章内容 *
+          </label>
+          <textarea
+            id="markdown"
+            name="markdown"
+            rows="12"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+            placeholder="请输入 Markdown 格式的文章内容"
+            required
+          ></textarea>
+        </div>
+
+
+
+        <div>
+          <label for="categories" class="block text-sm font-medium text-gray-700 mb-1">
+            分类
+          </label>
+          <select
+            id="categories"
+            name="categories"
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">请选择分类</option>
+            <option value="靈魂醬料">靈魂醬料</option>
+            <option value="經典餅類">經典餅類</option>
+            <option value="炸烤滷味">炸烤滷味</option>
+            <option value="飽肚主食">飽肚主食</option>
+            <option value="甜點冰品">甜點冰品</option>
+          </select>
+        </div>
+
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            id="draft"
+            name="draft"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            checked
+          />
+          <label for="draft" class="ml-2 block text-sm text-gray-700">
+            保存为草稿
+          </label>
+        </div>
+
+        <div class="flex justify-end space-x-4 pt-4">
+          <button
+            type="button"
+            id="preview-btn"
+            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors"
+          >
+            预览
+          </button>
+          <button
+            type="submit"
+            id="save-btn"
+            class="px-6 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors"
+          >
+            保存文章
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div id="preview-container" class="bg-white rounded-lg shadow-md p-6 hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold">预览</h2>
+        <button
+          id="close-preview"
+          class="px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors text-sm"
+        >
+          关闭
+        </button>
+      </div>
+      <div id="preview-content" class="prose max-w-none"></div>
+    </div>
+  </div>
+
+  <script>
+    import { marked } from "marked";
+
+    const form = document.getElementById("article-form") as HTMLFormElement | null;
+    const saveButton = document.getElementById("save-btn");
+    const previewButton = document.getElementById("preview-btn");
+    const closePreviewButton = document.getElementById("close-preview");
+    const previewContainer = document.getElementById("preview-container");
+    const previewContent = document.getElementById("preview-content");
+
+    if (form && saveButton) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const titleInput = document.getElementById("title") as HTMLInputElement | null;
+        const metaTitleInput = document.getElementById("meta_title") as HTMLInputElement | null;
+        const imageInput = document.getElementById("image") as HTMLInputElement | null;
+        const imageUploadInput = document.getElementById("image-upload") as HTMLInputElement | null;
+        const youtubeInput = document.getElementById("youtube") as HTMLInputElement | null;
+        const authorsInput = document.getElementById("authors") as HTMLSelectElement | null;
+        const viewsInput = document.getElementById("views") as HTMLInputElement | null;
+        const markdownInput = document.getElementById("markdown") as HTMLTextAreaElement | null;
+        const categoriesInput = document.getElementById("categories") as HTMLSelectElement | null;
+        const draftInput = document.getElementById("draft") as HTMLInputElement | null;
+
+        if (!titleInput || !markdownInput) {
+          alert("表单元素缺失，请刷新页面重试");
+          return;
+        }
+
+        const title = titleInput.value;
+        const meta_title = metaTitleInput?.value || "";
+        // 自动从文章内容中提取描述（取前150个字符）
+        const markdown = markdownInput.value;
+        const description = markdown.replace(/[#*`\[\]()]/g, '').substring(0, 150).trim() || "";
+        const image = imageInput?.value || "";
+        const youtube = youtubeInput?.value || "";
+        const authors = authorsInput?.value || "";
+        const views = viewsInput?.value ? parseInt(viewsInput.value) : 0;
+        const categories = categoriesInput?.value || "";
+        const draft = draftInput?.checked || false;
+
+        // 处理图片上传
+        if (imageUploadInput && imageUploadInput.files && imageUploadInput.files[0]) {
+          const file = imageUploadInput.files[0];
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          try {
+            // 上传到 R2 空间
+            const uploadResponse = await fetch('/api/admin/upload', {
+              method: 'POST',
+              body: formData
+            });
+            
+            if (uploadResponse.ok) {
+              const uploadData = await uploadResponse.json();
+              // 自动填写图片路径
+              if (imageInput) {
+                imageInput.value = uploadData.url;
+              }
+            } else {
+              alert('图片上传失败，请重试');
+            }
+          } catch (error) {
+            console.error('上传错误:', error);
+            alert('图片上传失败，请检查网络连接');
+          }
+        }
+
+        // 表单验证
+        if (!title.trim()) {
+          alert("请输入文章标题");
+          return;
+        }
+
+        if (!markdown.trim()) {
+          alert("请输入文章内容");
+          return;
+        }
+
+        try {
+          const response = await fetch("/api/admin/articles", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              title,
+              meta_title,
+              description,
+              image,
+              youtube,
+              authors: [authors].filter(Boolean),
+              views,
+              markdown,
+              categories: [categories].filter(Boolean),
+              draft,
+            }),
+          });
+
+          if (response.ok) {
+            alert("保存成功");
+            // 可以选择跳转到管理后台或清空表单
+            form.reset();
+          } else {
+            alert("保存失败，请重试");
+          }
+        } catch (error) {
+          console.error("保存文章时出错:", error);
+          alert("保存失败，请检查控制台错误");
+        }
+      });
+    }
+
+    if (previewButton && previewContent && previewContainer && closePreviewButton) {
+      previewButton.addEventListener("click", () => {
+        const titleInput = document.getElementById("title") as HTMLInputElement | null;
+        const markdownInput = document.getElementById("markdown") as HTMLTextAreaElement | null;
+        
+        if (!markdownInput) {
+          alert("表单元素缺失，请刷新页面重试");
+          return;
+        }
+
+        const title = titleInput?.value || "";
+        const markdown = markdownInput.value;
+        
+        if (!markdown.trim()) {
+          alert("请输入文章内容以预览");
+          return;
+        }
+
+        const previewHtml = `
+          <h1>${title || "未命名文章"}</h1>
+          ${marked(markdown)}
+        `;
+        
+        previewContent.innerHTML = previewHtml;
+        previewContainer.classList.remove("hidden");
+      });
+
+      closePreviewButton.addEventListener("click", () => {
+        previewContainer.classList.add("hidden");
+      });
+    }
+  </script>
+</Base>

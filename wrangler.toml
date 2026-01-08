@@ -1,0 +1,20 @@
+name = "astro"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[pages]
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "jiaweidao-db"
+database_name = "jiaweidao-db"
+database_id = "b3515425-2ef8-4349-b64f-54ad708c6f6a"
+
+[[r2_buckets]]
+binding = "images"
+bucket_name = "images"
+
+# [[kv_namespaces]]
+# binding = "SESSION"
+# id = "your-kv-namespace-id"
+# preview_id = "your-preview-kv-namespace-id"

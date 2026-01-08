@@ -1,0 +1,95 @@
+---
+import Base from "@/layouts/Base.astro";
+import PostSingle from "@/partials/PostSingle.astro";
+import { marked } from "marked";
+
+export async function getStaticPaths(): Promise<Array<{ params: { single: string } }>> {
+  let paths: Array<{ params: { single: string } }> = [];
+  
+  // 在构建时，Astro.locals 是 undefined，所以我们需要检查它
+  if ((Astro.locals as any)?.runtime?.env?.DB) {
+    const { DB } = (Astro.locals as any).runtime.env as { DB: any };
+    const result = await DB.prepare(`
+      SELECT slug
+      FROM articles
+      WHERE draft = 0
+    `).all();
+    
+    paths = (result.results ?? []).map((article: any) => ({
+      params: { single: article.slug }
+    }));
+  }
+  
+  return paths;
+}
+
+export const prerender = true;
+
+// 路由参数
+const { single } = Astro.params;
+
+// 查询文章
+let article = null;
+console.log("Requesting article with slug:", single);
+if ((Astro.locals as any)?.runtime?.env?.DB) {
+  console.log("DB is available");
+  const { DB } = (Astro.locals as any).runtime.env as { DB: any };
+  try {
+    article = await DB.prepare(`
+      SELECT *
+      FROM articles
+      WHERE slug = ? AND draft = 0
+      LIMIT 1
+    `).bind(single).first();
+    console.log("Query result:", article);
+  } catch (error) {
+    console.error("Database error:", error);
+  }
+} else {
+  console.log("DB is not available, using mock data");
+  // 提供模拟数据，以便在没有数据库连接时也能显示文章
+  article = {
+    slug: single,
+    title: `Mock Article: ${single}`,
+    description: `This is a mock article for testing purposes.`,
+    markdown: `# Mock Article: ${single}\n\nThis is a mock article generated for testing the blog route.\n\n## Section 1\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit.\n\n## Section 2\n\nSed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
+    meta_title: `Mock Article: ${single}`,
+    image: null,
+    date: new Date().toISOString().split('T')[0],
+    categories: '[]',
+    tags: '[]',
+    authors: '[]'
+  };
+}
+
+if (!article) {
+  console.log("Article not found, returning 404");
+  return new Response("Post not found", { status: 404 });
+}
+
+// 🔁 适配你原来的 Markdown post 结构
+const post = {
+  id: article.slug,
+  body: marked(article.markdown),
+  data: {
+    title: article.title,
+    meta_title: article.meta_title ?? article.title,
+    description: article.description,
+    image: article.image,
+    date: article.date,
+    categories: JSON.parse(article.categories ?? "[]"),
+    tags: JSON.parse(article.tags ?? "[]"),
+    authors: JSON.parse(article.authors ?? "[]"),
+  },
+};
+
+const { title, meta_title, image, description } = post.data;
+---
+<Base
+  title={title}
+  meta_title={meta_title}
+  description={description}
+  image={image}
+>
+  <PostSingle post={post} />
+</Base>

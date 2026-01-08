@@ -1,0 +1,55 @@
+---
+export const prerender = false;
+
+import Posts from "@/layouts/components/Posts.astro";
+import Base from "@/layouts/Base.astro";
+
+let posts = [];
+
+// 只在有运行时环境时查询数据库
+if ((Astro.locals as any)?.runtime?.env?.DB) {
+  // ⭐ Cloudflare Pages SSR：直接拿 D1
+  const { DB } = (Astro.locals as any).runtime.env;
+
+  // 从数据库按 views 排序
+  const result = await DB.prepare(`
+    SELECT
+      slug,
+      title,
+      description,
+      image,
+      date,
+      views
+    FROM articles
+    WHERE draft = 0
+    ORDER BY views DESC
+  `).all();
+
+  // ⚠️ 这里的结构要“伪装成你 Posts 组件认识的格式”
+  posts = (result.results ?? []).map((row: any) => ({
+    id: row.slug,
+    slug: row.slug,
+    body: '', // 添加空body字段
+    data: {
+      title: row.title,
+      description: row.description,
+      image: row.image,
+      date: row.date,
+      views: row.views,
+      authors: [], // 添加空authors数组
+      categories: [], // 添加空categories数组
+    },
+  }));
+}
+
+const title = "热门排行";
+---
+<Base title={title || "Popular"}>
+  <div class="section">
+    <div class="container">
+      <p class="text-center text-2xl mb-4"></p>
+      <h1 class="h2 mb-16 text-center text-primary">{title}</h1>
+      <Posts posts={posts} fluid={false} />
+    </div>
+  </div>
+</Base>
